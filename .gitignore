@@ -27,4 +27,4 @@ build/
 
 # Temporary files
 *.tmp
-*.log
+*.log".obsidian/" 
