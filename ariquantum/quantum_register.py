@@ -371,7 +371,7 @@ class QuantumRegister:
         Raises:
             QuantumMeasurementError: If called before any measurements have been performed.
         """
-        if not all(self.__is_measured):
+        if not any(self.__is_measured):
             raise QuantumMeasurementError(
                 "Measurement is required before accessing results. "
             )
