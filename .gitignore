@@ -9,10 +9,6 @@ venv/
 .venv/
 ENV/
 
-# PyCharm
-.idea/
-*.iml
-
 # Build artifacts
 dist/
 build/
@@ -28,3 +24,6 @@ build/
 # Temporary files
 *.tmp
 *.log".obsidian/" 
+
+# Obsidian
+.obsidian/

@@ -311,6 +311,7 @@ class QuantumRegister:
 
         Returns:
             Binary string of measurement results (For example, "010" for three qubits).
+            Length always equals num_qubits. Unmeasured qubits are padded with '0'.
 
         Raises:
             QubitIndexError: If any qubit index is out of range.
@@ -319,39 +320,41 @@ class QuantumRegister:
             qubits = list(range(self.__num_qubits))
         else:
             if len(qubits) != len(set(qubits)):
-                raise QubitIndexError(
-                    "Duplicate qubit indices are not allowed."
-                )
+                raise QubitIndexError("Duplicate qubit indices are not allowed.")
             if any(q >= self.__num_qubits or q < 0 for q in qubits):
-                raise QubitIndexError(
-                    "Qubit index out of range."
-                )
+                raise QubitIndexError("Qubit index out of range.")
+
         for i in qubits:
             self.__all_operations.append(['↗', [], False, [i]])
 
-        k = len(qubits)
         num_states = 2 ** self.__num_qubits
-        outcome_probabilities = np.zeros(2 ** k, dtype=float)
+        outcome_probabilities = np.zeros(num_states, dtype=float)
+        measured_set = set(qubits)
 
         for i in range(num_states):
-            outcome_index = 0
-            for q in qubits:
-                bit = (i >> (self.__num_qubits - 1 - q)) & 1
-                outcome_index = (outcome_index << 1) | bit
-            outcome_probabilities[outcome_index] += abs(self.__state[i]) ** 2
+            prob = abs(self.__state[i]) ** 2
+            if prob == 0.0:
+                continue
+
+            modified_i = i
+            for q in range(self.__num_qubits):
+                if q not in measured_set:
+                    bit_pos = self.__num_qubits - 1 - q
+                    modified_i &= ~(1 << bit_pos)
+
+            outcome_probabilities[modified_i] += prob
 
         total_prob = np.sum(outcome_probabilities)
-        outcome_probabilities /= total_prob
-        possible_outcomes = np.arange(2 ** k)
-        chosen_outcome = np.random.choice(possible_outcomes, p=outcome_probabilities)
+        if total_prob > 1e-12:
+            outcome_probabilities /= total_prob
 
         self.__measured_probabilities = outcome_probabilities
         for q in qubits:
             self.__is_measured[q] = True
 
-        bin_state = bin(chosen_outcome)
-        bin_state = "0" * (k - len(bin_state[2:])) + bin_state[2:]
-        return bin_state
+        chosen_outcome = np.random.choice(num_states, p=outcome_probabilities)
+        return format(chosen_outcome, f'0{self.__num_qubits}b')
+    
 
     def get_counts(self, shots):
         """Obtain measurement statistics by repeatedly simulating the quantum circuit.
@@ -377,19 +380,50 @@ class QuantumRegister:
             )
 
         probabilities = self.__measured_probabilities
-        num_measure_qubits = int(log2(len(probabilities)))
-        states = ["0" * (num_measure_qubits - len(bin(i)[2:])) + bin(i)[2:]
-                  for i in range(2 ** num_measure_qubits)]
+        num_qubits = int(log2(len(probabilities)))
 
+        sampled_indices = np.random.choice(2 ** num_qubits, size=shots, p=probabilities)
+        
+        result = {}
+        for idx in sampled_indices:
+            m = format(idx, f'0{num_qubits}b')
+            result[m] = result.get(m, 0) + 1
+
+        return result
+    
+    def measure_probabilities(self, decimals=5, show_all_states=False):
+        """Return measurement probabilities based on the last performed measurement.
+
+        Formats the probabilities stored in `__measured_probabilities` into a
+        readable dictionary mapping computational basis states to their probabilities.
+
+        Args:
+            decimals: Number of decimal places for probability values. Defaults to 5.
+            show_all_states: If True, includes all 2^num_qubits basis states in the output,
+                             even those with zero probability. If False, only includes states
+                             with non-zero probability. Defaults to False.
+
+        Returns:
+            Dictionary mapping binary strings (e.g., '010') to probabilities (floats in [0, 1]).
+
+        Raises:
+            QuantumMeasurementError: If called before any measurement has been performed.
+        """
+        if self.__measured_probabilities is None:
+            raise QuantumMeasurementError(
+                "Measurement is required before accessing probabilities. "
+            )
+
+        probs = self.__measured_probabilities
+        num_bits = int(log2(len(probs)))
         result = {}
 
-        for _ in range(shots):
-            m = str(np.random.choice(states, p=probabilities))
+        for i, p in enumerate(probs):
+            state_str = format(i, f'0{num_bits}b')
+            prob_val = round(float(p), decimals)
 
-            if m not in result:
-                result[m] = 1
-            else:
-                result[m] += 1
+            if show_all_states or prob_val > 0.0:
+                result[state_str] = prob_val
 
         return result
 

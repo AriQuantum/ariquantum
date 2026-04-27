@@ -262,36 +262,25 @@ class Qubit:
         Returns:
             String '0' or '1', depending on the measurement result of the qubit.
         """
-        qubits = [0]
-        for i in qubits:
-            self.__all_operations.append(['↗', [], False, [i]])
+        self.__all_operations.append(['↗', [], False, [0]])
 
-        k = len(qubits)
-        num_states = 2
-        outcome_probabilities = np.zeros(2 ** k, dtype=float)
+        prob0 = abs(self.__state[0]) ** 2
+        prob1 = abs(self.__state[1]) ** 2
+        total_prob = prob0 + prob1
 
-        for i in range(num_states):
-            outcome_index = 0
-            for q in qubits:
-                bit = (i >> (-q)) & 1
-                outcome_index = (outcome_index << 1) | bit
-            outcome_probabilities[outcome_index] += abs(self.__state[i]) ** 2
-
-        total_prob = np.sum(outcome_probabilities)
-        if total_prob == 0:
+        if total_prob <= 1e-12:
             raise ValueError("Total probability is zero.")
-        outcome_probabilities /= total_prob
 
-        possible_outcomes = np.arange(2 ** k)
-        chosen_outcome = np.random.choice(possible_outcomes, p=outcome_probabilities)
+        prob0 /= total_prob
+        prob1 /= total_prob
 
-        self.__measured_probabilities = outcome_probabilities
-        for q in qubits:
-            self.__is_measured[q] = True
+        self.__measured_probabilities = np.array([prob0, prob1])
+        self.__is_measured[0] = True
 
-        bin_state = bin(chosen_outcome)
-        bin_state = "0" * (k - len(bin_state[2:])) + bin_state[2:]
-        return bin_state
+        chosen = np.random.choice([0, 1], p=[prob0, prob1])
+
+        return '1' if chosen else '0'
+
 
     def get_counts(self, shots):
         """Obtain measurement statistics by repeatedly simulating the quantum circuit.
@@ -318,32 +307,51 @@ class Qubit:
 
         prob0, prob1 = self.__measured_probabilities
 
-        result = {'0': 0, '1': 0}
-        for _ in range(shots):
-            m = np.random.choice(['0', '1'], p=[prob0, prob1])
-            result[m] += 1
+        outcomes = np.random.choice(['0', '1'], size=shots, p=[prob0, prob1])
+
+        unique, counts = np.unique(outcomes, return_counts=True)
+        result = dict(zip(unique, counts))
+
+        result = {str(k): int(v) for k, v in zip(unique, counts)}
+
+        result.setdefault('0', 0)
+        result.setdefault('1', 0)
 
         return result
 
-    def measure_probabilities(self, decimals=5):
-        """
-        Calculate the measurement probabilities for the qubit in computational basis.
+    def measure_probabilities(self, decimals=5, show_all_states=False):
+        """Return measurement probabilities based on the last performed measurement.
 
-        Computes the probabilities of measuring the qubit in |0⟩ and |1⟩ states,
-        returned as percentages with specified precision.
+        Formats the probabilities stored in the qubit's measurement state into a
+        readable dictionary mapping |0⟩ and |1⟩ to their probabilities.
 
         Args:
-            decimals: Number of decimal places for probability values.
-                      Defaults to 5.
+            decimals: Number of decimal places for probability values. Defaults to 5.
+            show_all_states: If True, includes both '0' and '1' states even if probability is 0.
+                             If False, only includes states with non-zero probability. Defaults to False.
 
         Returns:
             Dictionary with measurement probabilities:
-            - Key '0': Probability of measuring |0⟩ state (as percentage).
-            - Key '1': Probability of measuring |1⟩ state (as percentage).
+            - Key '0': Probability of measuring |0⟩ state (float in [0, 1]).
+            - Key '1': Probability of measuring |1⟩ state (float in [0, 1]).
+
+        Raises:
+            QuantumMeasurementError: If called before any measurement has been performed.
         """
-        probability_0 = float(round(abs(abs(self.__state[0] ** 2) * 100), decimals))
-        probability_1 = float(round(abs(abs(self.__state[1] ** 2) * 100), decimals))
-        return {'0': probability_0, '1': probability_1}
+        if not self.__is_measured:
+            raise QuantumMeasurementError(
+                "Measurement is required before accessing probabilities."
+            )
+
+        probs = self.__measured_probabilities
+        result = {}
+
+        for state_key, prob in zip(['0', '1'], probs):
+            prob_val = round(float(prob), decimals)
+            if show_all_states or prob_val > 0.0:
+                result[state_key] = prob_val
+
+        return result
 
     def bloch_coordinates(self, decimals=4):
         """

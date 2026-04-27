@@ -3,9 +3,15 @@
 **Простая библиотека для симуляции квантовых вычислений с интуитивным интерфейсом.**  
 Идеально подходит для студентов и новичков в квантовых вычислениях — никаких сложных зависимостей и шумовых моделей, только базовые операции и визуализация.
 
+[![PyPI version](https://badge.fury.io/py/ariquantum.svg)](https://badge.fury.io/py/ariquantum)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/ariquantum?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/ariquantum)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+
+
 ---
 
-## 🚀 Установка
+## Установка
 
 Требуется Python 3.9+ и `numpy`:
 ```bash
@@ -14,7 +20,7 @@ pip install ariquantum
 
 ---
 
-## 🧪 Быстрый старт
+## Быстрый старт
 
 ### 1. Работа с отдельными кубитами
 ```python
@@ -61,7 +67,7 @@ print(qr.get_counts(shots=100))
 
 ---
 
-## ✨ Основные возможности
+## Основные возможности
 - **Гибкое управление**: Работа с отдельными кубитами и квантовыми регистрами.
 - **Визуализация схем**: Автоматическая отрисовка квантовых цепей в ASCII-графике.
 - **Бра-кет нотация**: Человекочитаемое представление состояний (например, `0.7|00⟩ + 0.7|11⟩`).
@@ -69,7 +75,7 @@ print(qr.get_counts(shots=100))
 
 ---
 
-## 📂 Структура проекта
+## Структура проекта
 ```
 ariquantum/
 ├── __init__.py
@@ -83,15 +89,15 @@ ariquantum/
 
 ---
 
-## ⚖️ Лицензия
+## Лицензия
 Распространяется под лицензией **[MIT](https://opensource.org/licenses/MIT)**.
 
 ---
 
-## ❓ Поддержка
+## Поддержка
 Вопросы и предложения можно отправлять:
-- 🐞 [Issues на GitHub](https://github.com/ariquantum)
-- ✉️ Email: arimshcherbakov@gmail.com
-- 💬 Telegram: [@ArimShcherbakov](https://t.me/ArimShcherbakov)
+- [Issues на GitHub](https://github.com/ariquantum)
+- Email: arimshcherbakov@gmail.com
+- Telegram: [@ArimShcherbakov](https://t.me/ArimShcherbakov)
 
-🌐 English version: [README.md](README.md)
+English version: [README.md](README.md)

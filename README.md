@@ -3,9 +3,15 @@
 **A simple quantum computing simulation library with an intuitive interface.**  
 Perfect for students and beginners in quantum computing — no complex dependencies or noise models, just core operations and visualization.
 
+[![PyPI version](https://badge.fury.io/py/ariquantum.svg)](https://badge.fury.io/py/ariquantum)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/ariquantum?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/ariquantum)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+
+
 ---
 
-## 🚀 Installation
+## Installation
 
 Requires Python 3.9+ and `numpy`:
 ```bash
@@ -14,7 +20,7 @@ pip install ariquantum
 
 ---
 
-## 🧪 Quick Start
+## Quick Start
 
 ### 1. Working with individual qubits
 ```python
@@ -61,7 +67,7 @@ print(qr.get_counts(shots=100))
 
 ---
 
-## ✨ Key Features
+## Key Features
 - **Flexible control**: Manage individual qubits or full quantum registers.
 - **Circuit visualization**: Auto-generated ASCII diagrams of quantum circuits.
 - **Bra-ket notation**: Human-readable state representation (e.g., `0.7|00⟩ + 0.7|11⟩`).
@@ -69,7 +75,7 @@ print(qr.get_counts(shots=100))
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 ```
 ariquantum/
 ├── __init__.py
@@ -83,15 +89,15 @@ ariquantum/
 
 ---
 
-## ⚖️ License
+## License
 Distributed under the **[MIT License](https://opensource.org/licenses/MIT)**.
 
 ---
 
-## ❓ Support
+## Support
 For questions or feedback:
-- 🐞 [GitHub Issues](https://github.com/ariquantum)
-- ✉️ Email: arimshcherbakov@gmail.com
-- 💬 Telegram: [@ArimShcherbakov](https://t.me/ArimShcherbakov)
+- [GitHub Issues](https://github.com/ariquantum)
+- Email: arimshcherbakov@gmail.com
+- Telegram: [@ArimShcherbakov](https://t.me/ArimShcherbakov)
 
 🇷🇺 Русская версия: [README_RU.md](README_RU.md)
